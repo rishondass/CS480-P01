@@ -3,6 +3,7 @@ import csv, sys
 from pprint import pprint
 from PQ import PriorityQueue
 #from queue import PriorityQueue
+from AdjacencyList import Graph
 
 
 
@@ -30,7 +31,7 @@ def sort(arr):
             # Swap if the element found is greater
             # than the next element
             if arr[j][1] > arr[j+1][1]:
-                print(arr[j][1],arr[j+1][1])
+                #print(arr[j][1],arr[j+1][1])
                 temp = arr[j]
                 arr[j]= arr[j+1]
                 arr[j+1] = temp
@@ -41,23 +42,26 @@ with open('driving.csv', newline='') as csvfile:
     reader = list(csv.reader(csvfile))
     v = len(reader)-1
     graphs = [[] for i in range(v)]
-    someList = []
+    alGraph = Graph(v)
+    costList = [[0 for x in range(v)] for y in range(v)]
     for i in range(0, len(reader)-1):
         temp = []
         for j in range(0,len(reader[i])-1):
             cost = reader[i+1][j+1]
             if (int(cost) > 0):
                 addedge(graphs,i,j,cost)
+                alGraph.add_edge(i,j,cost)
                 temp.append({"state":reader[0][j+1], "weight": reader[i+1][j+1]})
                 graph[i]= {"state":reader[i][0], "data":temp}
+            costList[i][j]=cost
         stateToNum[reader[i][0]] = i-1
         numToState[i] = reader[i+1][0]
-        someList.append(temp)
+        
 
     #print(graphs[17])
     #print(numToState)
     #print(stateToNum)
-    #print(someList[17])
+    #print(someList[0][8])
   
     
     
@@ -98,10 +102,11 @@ def best_first_search(actual_Src, target, n):
     visited = [False] * n
     pq = PriorityQueue()
     order = []
-    pq.insert((0, actual_Src))
+    pq.insert((0, actual_Src,numToState[actual_Src],costList[actual_Src][actual_Src]))
     visited[actual_Src] = True
+    cost = 0
     while pq.isEmpty() == False:
-        print(pq)
+        #print(pq)
         smf = pq.delete()
         #print(str(smf))
         u = smf[1]
@@ -109,15 +114,27 @@ def best_first_search(actual_Src, target, n):
         # Displaying the path having lowest cost
         #print(numToState[u], end=" ")
         order.append(numToState[u])
+        # cost = cost+smf[2]
+        #print(cost)
+        cost = cost + int(smf[3])
         if u == target:
             break
-        temp = -1
+        count = 0
         for v, c in graphs[u]:
             if visited[v] == False:
                 visited[v] = True
-                pq.insert((slGraph[v][target][1], v,numToState[v]))
+                count = count - 1
+                pq.insert((slGraph[v][target][1], v,numToState[v],costList[u][v]))
+        if(count==0):
+            order.pop(len(order)-1)
+        
+    #print(visited[32])
     print(order)
+    print(cost)
+    #print(pq)
     #print(sort(order))
+    
+
 
  
  
@@ -125,12 +142,20 @@ def best_first_search(actual_Src, target, n):
 # implemented using integers addedge(x,y,cost);
 #addedge(0, 1, 210)
 
-# src = stateToNum[sys.argv[1]]
-# dest = stateToNum[sys.argv[2]]
+src = stateToNum[sys.argv[1]]
+dest = stateToNum[sys.argv[2]]
 
-src = stateToNum["MA"]
-dest = stateToNum["MD"]
+# src = stateToNum["MA"]
+# dest = stateToNum["MD"]
 
 best_first_search(src, dest, v)
-# for i in order:
-#     print(numToState[i])
+# print("MD->WA:")
+# best_first_search(stateToNum["MD"], stateToNum["WA"], v)
+# print("MI->NM:")
+# best_first_search(stateToNum["MI"], stateToNum["NM"], v)
+# print("NH->AL:")
+# best_first_search(stateToNum["NH"], stateToNum["AL"], v)
+# print("OR->NY:")
+# best_first_search(stateToNum["OR"], stateToNum["NY"], v)
+# print("MA->AK:")
+# best_first_search(stateToNum["MA"], stateToNum["AK"], v)
