@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import csv, sys
-import queue
 from pprint import pprint
-from queue import PriorityQueue
+from PQ import PriorityQueue
+#from queue import PriorityQueue
 
 
 
@@ -19,6 +19,22 @@ numToState = {}
 
 def addedge(g,x, y, cost):
     g[x].append((y, cost))
+    
+def sort(arr):
+    n = len(arr)
+    # Traverse through all array elements
+    for i in range(n):
+        # Last i elements are already in place
+        for j in range(0, i-1):
+            # traverse the array from 0 to n-i-1
+            # Swap if the element found is greater
+            # than the next element
+            if arr[j][1] > arr[j+1][1]:
+                print(arr[j][1],arr[j+1][1])
+                temp = arr[j]
+                arr[j]= arr[j+1]
+                arr[j+1] = temp
+    return arr
 
 
 with open('driving.csv', newline='') as csvfile:
@@ -38,10 +54,10 @@ with open('driving.csv', newline='') as csvfile:
         numToState[i] = reader[i+1][0]
         someList.append(temp)
 
-    print(graphs[17])
+    #print(graphs[17])
     #print(numToState)
     #print(stateToNum)
-    print(someList[17])
+    #print(someList[17])
   
     
     
@@ -77,43 +93,31 @@ with open('straightline.csv', newline='') as csvfile:
  
 # Function For Implementing Best First Search
 # Gives output path having lowest cost
-order = []
+
 def best_first_search(actual_Src, target, n):
     visited = [False] * n
     pq = PriorityQueue()
-    queue = []
-    #pq.put((0, actual_Src))
-    queue.append((0,actual_Src))
+    order = []
+    pq.insert((0, actual_Src))
     visited[actual_Src] = True
-    while queue != []:
-        u = queue.pop(0)[1]
+    while pq.isEmpty() == False:
+        print(pq)
+        smf = pq.delete()
+        #print(str(smf))
+        u = smf[1]
         
         # Displaying the path having lowest cost
-        print(numToState[u], end=" ")
-        order.append(u)
+        #print(numToState[u], end=" ")
+        order.append(numToState[u])
         if u == target:
             break
         temp = -1
         for v, c in graphs[u]:
             if visited[v] == False:
                 visited[v] = True
-                queue.append((slGraph[v][target][1], v))
-    # while pq.empty() == False:
-    #     u = pq.get()[1]
-        
-    #     # Displaying the path having lowest cost
-    #     print(numToState[u], end=" ")
-    #     order.append(u)
-    #     if u == target:
-    #         break
-    #     temp = -1
-    #     for v, c in graphs[u]:
-    #         if visited[v] == False:
-    #             visited[v] = True
-    #             pq.put((slGraph[v][target][1], v))
-    print(queue)
-    print()
- 
+                pq.insert((slGraph[v][target][1], v,numToState[v]))
+    print(order)
+    #print(sort(order))
 
  
  
