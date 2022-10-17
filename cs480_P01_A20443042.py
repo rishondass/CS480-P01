@@ -54,7 +54,7 @@ with open('driving.csv', newline='') as csvfile:
                 temp.append({"state":reader[0][j+1], "weight": reader[i+1][j+1]})
                 graph[i]= {"state":reader[i][0], "data":temp}
             costList[i][j]=cost
-        stateToNum[reader[i][0]] = i-1
+        stateToNum[reader[i+1][0]] = i
         numToState[i] = reader[i+1][0]
         
 
@@ -82,19 +82,6 @@ with open('straightline.csv', newline='') as csvfile:
 # print(slGraph[37][18])
 # print(slGraph[44][18])
 
-
-
-
-
-
-
-
-
-
-
-
-
- 
 # Function For Implementing Best First Search
 # Gives output path having lowest cost
 
@@ -103,8 +90,7 @@ def best_first_search(actual_Src, target, n):
     pq = PriorityQueue()
     order = []
     pq.insert((0, actual_Src,numToState[actual_Src],costList[actual_Src][actual_Src]))
-    visited[actual_Src] = True
-    cost = 0
+    visited[actual_Src] = numToState[actual_Src]
     while pq.isEmpty() == False:
         #print(pq)
         smf = pq.delete()
@@ -116,46 +102,125 @@ def best_first_search(actual_Src, target, n):
         order.append(numToState[u])
         # cost = cost+smf[2]
         #print(cost)
-        cost = cost + int(smf[3])
         if u == target:
             break
-        count = 0
+        
         for v, c in graphs[u]:
             if visited[v] == False:
-                visited[v] = True
-                count = count - 1
+                visited[v] = numToState[u]
                 pq.insert((slGraph[v][target][1], v,numToState[v],costList[u][v]))
-        if(count==0):
-            order.pop(len(order)-1)
+        
+            
         
     #print(visited[32])
-    print(order)
-    print(cost)
+    #print(order)
+    order.reverse()
+    #print(order)
+    #print(visited)
+    path = []
+    #print(numToState[visited[stateToNum[order[0]]]])
+    #print(numToState[visited[stateToNum[order[1]]]])
+    
+    for x in order:
+        curr = visited[stateToNum[x]]
+        path.append(curr)
+        if(stateToNum[curr] == actual_Src):
+            break
+       
+    path.reverse()
+    
+    path.append(numToState[target])
+    #print(cost)
     #print(pq)
     #print(sort(order))
+    print(path)
+    
+    
+    cost = 0
+    for i in range(1,len(path)):
+        if (i!=0):
+            cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
+    print(cost)
     
 
+def A(actual_Src, target, n):
+    visited = [False] * n
+    pq = PriorityQueue()
+    order = []
+    pq.insert((0, actual_Src))
+    visited[actual_Src] = numToState[actual_Src]
+    while pq.isEmpty() == False:
+        #print(pq)
+        smf = pq.delete()
+        #print(str(smf))
+        u = smf[1]
+        
+        # Displaying the path having lowest cost
+        #print(numToState[u], end=" ")
+        order.append(numToState[u])
+        # cost = cost+smf[2]
+        #print(cost)
+        if u == target:
+            break
+        
+        for v, c in graphs[u]:
+            if visited[v] == False:
+                visited[v] = numToState[u]
+                totalVal = int(slGraph[v][target][1])+int(costList[u][v])
+                pq.insert((totalVal, v,numToState[v],costList[u][v],slGraph[v][target][1]))
+        
+            
+        
+    #print(visited[32])
+    #print(order)
+    order.reverse()
+    #print(order)
+    #print(visited)
+    path = []
+    #print(numToState[visited[stateToNum[order[0]]]])
+    #print(numToState[visited[stateToNum[order[1]]]])
+    
+    for x in order:
+        curr = visited[stateToNum[x]]
+        path.append(curr)
+        if(stateToNum[curr] == actual_Src):
+            break
+       
+    path.reverse()
+    
+    path.append(numToState[target])
+    #print(cost)
+    #print(pq)
+    #print(sort(order))
+    print(path)
+    
+    
+    cost = 0
+    for i in range(1,len(path)):
+        if (i!=0):
+            cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
+    print(cost)
 
- 
- 
-# The nodes shown in above example(by alphabets) are
-# implemented using integers addedge(x,y,cost);
-#addedge(0, 1, 210)
-
-src = stateToNum[sys.argv[1]]
-dest = stateToNum[sys.argv[2]]
+# src = stateToNum[sys.argv[1]]
+# dest = stateToNum[sys.argv[2]]
 
 # src = stateToNum["MA"]
 # dest = stateToNum["MD"]
 
-best_first_search(src, dest, v)
-# print("MD->WA:")
-# best_first_search(stateToNum["MD"], stateToNum["WA"], v)
+#best_first_search(src, dest, v)
+#A(src,dest,v)
+print("MD->WA:")
+best_first_search(stateToNum["MD"], stateToNum["WA"], v)
+A(stateToNum["MD"], stateToNum["WA"], v)
 # print("MI->NM:")
 # best_first_search(stateToNum["MI"], stateToNum["NM"], v)
+# A(stateToNum["MI"], stateToNum["NM"], v)
 # print("NH->AL:")
 # best_first_search(stateToNum["NH"], stateToNum["AL"], v)
+# A(stateToNum["NH"], stateToNum["AL"], v)
 # print("OR->NY:")
 # best_first_search(stateToNum["OR"], stateToNum["NY"], v)
+# A(stateToNum["OR"], stateToNum["NY"], v)
 # print("MA->AK:")
 # best_first_search(stateToNum["MA"], stateToNum["AK"], v)
+# A(stateToNum["MA"], stateToNum["AK"], v)
