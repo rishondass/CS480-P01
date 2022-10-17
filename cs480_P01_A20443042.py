@@ -148,7 +148,8 @@ def A(actual_Src, target, n):
     pq = PriorityQueue()
     order = []
     pq.insert((0, actual_Src))
-    visited[actual_Src] = numToState[actual_Src]
+    visited[actual_Src] = (numToState[actual_Src],0)
+    
     while pq.isEmpty() == False:
         #print(pq)
         smf = pq.delete()
@@ -162,32 +163,39 @@ def A(actual_Src, target, n):
         #print(cost)
         if u == target:
             break
-        
+        prevCost = int(visited[u][1])
         for v, c in graphs[u]:
             if visited[v] == False:
-                visited[v] = numToState[u]
-                totalVal = int(slGraph[v][target][1])+int(costList[u][v])
+                visited[v] = (numToState[u],int(costList[u][v])+prevCost)
+                totalVal = int(slGraph[v][target][1])+(int(costList[u][v])+visited[u][1])
+                #totalVal = (int(costList[u][v])+visited[u][1])
                 pq.insert((totalVal, v,numToState[v],costList[u][v],slGraph[v][target][1]))
+                if v == target:
+                    print("TARGET FOUND")
+                    printOutput(order,visited,actual_Src,target)
         
             
-        
+def printOutput(order,visited,actual_Src,target):
     #print(visited[32])
-    #print(order)
+    print("Order:==================")
+    print(order)
     order.reverse()
-    #print(order)
-    #print(visited)
+    print(order)
+    print("==================\n\n")
+    print("Visited:==================")
+    print(visited)
+    print("==================\n\n")
     path = []
     #print(numToState[visited[stateToNum[order[0]]]])
     #print(numToState[visited[stateToNum[order[1]]]])
     
     for x in order:
-        curr = visited[stateToNum[x]]
+        curr = visited[stateToNum[x]][0]
         path.append(curr)
         if(stateToNum[curr] == actual_Src):
             break
        
     path.reverse()
-    
     path.append(numToState[target])
     #print(cost)
     #print(pq)
@@ -200,7 +208,7 @@ def A(actual_Src, target, n):
         if (i!=0):
             cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
     print(cost)
-
+    exit()
 # src = stateToNum[sys.argv[1]]
 # dest = stateToNum[sys.argv[2]]
 
