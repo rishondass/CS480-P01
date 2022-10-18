@@ -1,3 +1,6 @@
+# 
+# CREDIT: https://www.geeksforgeeks.org/priority-queue-in-python/
+# CREATED BY: Geeks for geeks
 # A simple implementation of Priority Queue
 # using Queue.
 class PriorityQueue(object):

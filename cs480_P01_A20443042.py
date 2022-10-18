@@ -52,16 +52,9 @@ def best_first_search(actual_Src, target, n):
     pq.insert((0, actual_Src,numToState[actual_Src],costList[actual_Src][actual_Src]))
     visited[actual_Src] = numToState[actual_Src]
     while pq.isEmpty() == False:
-        #print(pq)
         smf = pq.delete()
-        #print(str(smf))
         u = smf[1]
-        
-        # Displaying the path having lowest cost
-        #print(numToState[u], end=" ")
         order.append(numToState[u])
-        # cost = cost+smf[2]
-        #print(cost)
         if u == target:
             break
         
@@ -138,18 +131,6 @@ def A(actual_Src, target, n):
     
     return((path,cost))
     
-    
-# Greedy Best First Search:
-# 	Solution path: STATE1, STATE2, STATE3, …, STATEN-1, STATEN
-# 	Number of states on a path: X1
-# 	Path cost: Y1
-# 	Execution time: T1 seconds
-
-# A* Search:
-# 	Solution path: STATE1, STATE2, STATE3, …, STATEN-1, STATEN
-# 	Number of states on a path: X2
-# 	Path cost: Y2
-# 	Execution time: T2 seconds
 
 
 def printResult(result,time,isBsf):
@@ -205,13 +186,6 @@ if __name__ == "__main__":
         printResult(([],0),0,True)
         printResult(([],0),0,False)
         exit()
-    
-    # src = stateToNum["MA"]
-    # dest = stateToNum["MD"]
-    
-    # Last Name, First Name, AXXXXXXXX solution:
-	# Initial state: INITIAL
-	# Goal state: GOAL
 
     
     print("Dass, Rishon, A20443042 solution:\nInitial state: " + sys.argv[1] + "\nGoal state: " + sys.argv[2])
