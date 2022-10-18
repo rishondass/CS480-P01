@@ -1,9 +1,7 @@
 #!/usr/bin/python
 import csv, sys
-from pprint import pprint
+import time
 from PQ import PriorityQueue
-#from queue import PriorityQueue
-from AdjacencyList import Graph
 
 
 
@@ -14,7 +12,7 @@ from AdjacencyList import Graph
 
 
 
-graph = {}
+
 stateToNum = {}
 numToState = {}
 
@@ -25,31 +23,18 @@ def addedge(g,x, y, cost):
 with open('driving.csv', newline='') as csvfile:
     reader = list(csv.reader(csvfile))
     v = len(reader)-1
-    graphs = [[] for i in range(v)]
-    alGraph = Graph(v)
+    graph = [[] for i in range(v)]
     costList = [[0 for x in range(v)] for y in range(v)]
     for i in range(0, len(reader)-1):
         temp = []
         for j in range(0,len(reader[i])-1):
             cost = reader[i+1][j+1]
             if (int(cost) > 0):
-                addedge(graphs,i,j,cost)
-                alGraph.add_edge(i,j,cost)
-                temp.append({"state":reader[0][j+1], "weight": reader[i+1][j+1]})
-                graph[i]= {"state":reader[i][0], "data":temp}
+                addedge(graph,i,j,cost)
             costList[i][j]=cost
         stateToNum[reader[i+1][0]] = i
         numToState[i] = reader[i+1][0]
-        
-
-    #print(graphs[17])
-    #print(numToState)
-    #print(stateToNum)
-    #print(someList[0][8])
-  
     
-    
-
 with open('straightline.csv', newline='') as csvfile:
     reader1 = list(csv.reader(csvfile))
     v = len(reader1)-1
@@ -59,15 +44,6 @@ with open('straightline.csv', newline='') as csvfile:
             cost = reader1[i+1][j+1]
             addedge(slGraph,i,j,cost)
 
-#distance from CT->MD
-# print(slGraph[5][18][1])
-# print(slGraph[28][18])
-# print(slGraph[32][18])
-# print(slGraph[37][18])
-# print(slGraph[44][18])
-
-# Function For Implementing Best First Search
-# Gives output path having lowest cost
 
 def best_first_search(actual_Src, target, n):
     visited = [False] * n
@@ -89,21 +65,16 @@ def best_first_search(actual_Src, target, n):
         if u == target:
             break
         
-        for v, c in graphs[u]:
+        for v, c in graph[u]:
             if visited[v] == False:
                 visited[v] = numToState[u]
                 pq.insert((slGraph[v][target][1], v,numToState[v],costList[u][v]))
         
             
-        
-    #print(visited[32])
-    #print(order)
+   
     order.reverse()
-    #print(order)
-    #print(visited)
     path = []
-    #print(numToState[visited[stateToNum[order[0]]]])
-    #print(numToState[visited[stateToNum[order[1]]]])
+ 
     
     curr = visited[target]
     for x in order:
@@ -115,17 +86,13 @@ def best_first_search(actual_Src, target, n):
     path.reverse()
     
     path.append(numToState[target])
-    #print(cost)
-    #print(pq)
-    #print(sort(order))
-    print(path)
     
     
     cost = 0
     for i in range(1,len(path)):
         if (i!=0):
             cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
-    print(cost)
+    return((path,cost))
     
 
 def A(actual_Src, target, n):
@@ -136,20 +103,13 @@ def A(actual_Src, target, n):
     visited[actual_Src] = (numToState[actual_Src],0)
     
     while pq.isEmpty() == False:
-        #print(pq)
         smf = pq.delete()
-        #print(str(smf))
         u = smf[1]
-        
-        # Displaying the path having lowest cost
-        #print(numToState[u], end=" ")
         order.append(numToState[u])
-        # cost = cost+smf[2]
-        #print(cost)
         if u == target:
             break
         prevCost = int(visited[u][1])
-        for v, c in graphs[u]:
+        for v, c in graph[u]:
             if visited[v] == False:
                 visited[v] = (numToState[u],int(costList[u][v])+prevCost)
                 totalVal = int(slGraph[v][target][1])+(int(costList[u][v])+visited[u][1])
@@ -157,21 +117,8 @@ def A(actual_Src, target, n):
                 pq.insert((totalVal, v,numToState[v],costList[u][v],slGraph[v][target][1]))
                 if v == target:
                     break
-        
-            
-        
-    #print(visited[32])
-    # print("Order:==================")
-    # print(order)
-    # order.reverse()
-    # print(order)
-    # print("==================\n\n")
-    # print("Visited:==================")
-    # print(visited)
-    # print("==================\n\n")
+                
     path = []
-    #print(numToState[visited[stateToNum[order[0]]]])
-    #print(numToState[visited[stateToNum[order[1]]]])
     curr = visited[target][0]
     for x in order:
         path.append(curr)
@@ -182,41 +129,104 @@ def A(actual_Src, target, n):
        
     path.reverse()
     path.append(numToState[target])
-    #print(cost)
-    #print(pq)
-    #print(sort(order))
-    print(path)
     
     
     cost = 0
     for i in range(1,len(path)):
         if (i!=0):
             cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
-    print(cost)
+    
+    return((path,cost))
+    
+    
+# Greedy Best First Search:
+# 	Solution path: STATE1, STATE2, STATE3, …, STATEN-1, STATEN
+# 	Number of states on a path: X1
+# 	Path cost: Y1
+# 	Execution time: T1 seconds
 
-# src = stateToNum[sys.argv[1]]
-# dest = stateToNum[sys.argv[2]]
+# A* Search:
+# 	Solution path: STATE1, STATE2, STATE3, …, STATEN-1, STATEN
+# 	Number of states on a path: X2
+# 	Path cost: Y2
+# 	Execution time: T2 seconds
 
-# src = stateToNum["MA"]
-# dest = stateToNum["MD"]
 
-#best_first_search(src, dest, v)
-#A(src,dest,v)
-# print("MA->MD:")
-# best_first_search(stateToNum["MA"], stateToNum["MD"], v)
-# A(stateToNum["MA"], stateToNum["MD"], v)
-# print("MD->WA:")
-# best_first_search(stateToNum["MD"], stateToNum["WA"], v)
-# A(stateToNum["MD"], stateToNum["WA"], v)
-# print("MI->NM:")
-# best_first_search(stateToNum["MI"], stateToNum["NM"], v)
-# A(stateToNum["MI"], stateToNum["NM"], v)
-print("NH->AL:")
-best_first_search(stateToNum["NH"], stateToNum["AL"], v)
-A(stateToNum["NH"], stateToNum["AL"], v)
-print("OR->NY:")
-best_first_search(stateToNum["OR"], stateToNum["NY"], v)
-A(stateToNum["OR"], stateToNum["NY"], v)
-# print("MA->AK:")
-# best_first_search(stateToNum["MA"], stateToNum["AK"], v)
-# A(stateToNum["MA"], stateToNum["AK"], v)
+def printResult(result,time,isBsf):
+    if(result[0] != []):
+        if isBsf:
+            print("Greedy Best First Search:\nSolution path: ",end="")
+            print(result[0],end="")
+            print()
+            print("Number of states on a path: " + str(len(result[0])))
+            print("Path cost: " + str(result[1]))
+            print("Execution time: " + str(time))
+            print()
+            return
+        print("A* Search:\nSolution path: ",end="")
+        print(result[0],end="")
+        print()
+        print("Number of states on a path: " + str(len(result[0])))
+        print("Path cost: " + str(result[1]))
+        print("Execution time: " + str(time))
+        return
+    if isBsf:
+        print("Greedy Best First Search:\nSolution path: ",end="")
+        print("[NOT FOUND]",end="")
+        print()
+        print("Number of states on a path: N/A miles")
+        print("Path cost: 0 miles")
+        print("Execution time: " + str(time))
+        print()
+        return
+    print("A* Search:\nSolution path: ",end="")
+    print("[NOT FOUND]",end="")
+    print()
+    print("Number of states on a path: N/A miles")
+    print("Path cost: 0 miles")
+    print("Execution time: " + str(time))
+    return
+
+if __name__ == "__main__":
+
+    if(len(sys.argv) != 3):
+        print("ERROR: Not enough or too many input arguments.")
+        exit(1)
+    
+    try:
+        src = stateToNum[sys.argv[1]]
+    except Exception as e:
+        printResult([],0,True)
+        printResult([],0,False)
+        exit()
+    try:
+        dest = stateToNum[sys.argv[2]]
+    except Exception as e:
+        printResult(([],0),0,True)
+        printResult(([],0),0,False)
+        exit()
+    
+    # src = stateToNum["MA"]
+    # dest = stateToNum["MD"]
+    
+    # Last Name, First Name, AXXXXXXXX solution:
+	# Initial state: INITIAL
+	# Goal state: GOAL
+
+    
+    print("Dass, Rishon, A20443042 solution:\nInitial state: " + sys.argv[1] + "\nGoal state: " + sys.argv[2])
+    startTime = time.time()
+    try:
+        bsfResult = best_first_search(src, dest, v)
+        printResult(bsfResult,time.time()-startTime,True)
+    except Exception as e:
+        printResult([],0,True)
+    
+    startTime = time.time()
+    try:
+        aResult = A(src,dest,v)
+        printResult(aResult,time.time()-startTime,False)
+    except Exception as e:
+        printResult([],0,False)
+    
+    
