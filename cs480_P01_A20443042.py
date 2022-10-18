@@ -20,22 +20,6 @@ numToState = {}
 
 def addedge(g,x, y, cost):
     g[x].append((y, cost))
-    
-def sort(arr):
-    n = len(arr)
-    # Traverse through all array elements
-    for i in range(n):
-        # Last i elements are already in place
-        for j in range(0, i-1):
-            # traverse the array from 0 to n-i-1
-            # Swap if the element found is greater
-            # than the next element
-            if arr[j][1] > arr[j+1][1]:
-                #print(arr[j][1],arr[j+1][1])
-                temp = arr[j]
-                arr[j]= arr[j+1]
-                arr[j+1] = temp
-    return arr
 
 
 with open('driving.csv', newline='') as csvfile:
@@ -121,11 +105,12 @@ def best_first_search(actual_Src, target, n):
     #print(numToState[visited[stateToNum[order[0]]]])
     #print(numToState[visited[stateToNum[order[1]]]])
     
+    curr = visited[target]
     for x in order:
-        curr = visited[stateToNum[x]]
         path.append(curr)
         if(stateToNum[curr] == actual_Src):
             break
+        curr = visited[stateToNum[path[len(path)-1]]]
        
     path.reverse()
     
@@ -171,29 +156,29 @@ def A(actual_Src, target, n):
                 #totalVal = (int(costList[u][v])+visited[u][1])
                 pq.insert((totalVal, v,numToState[v],costList[u][v],slGraph[v][target][1]))
                 if v == target:
-                    print("TARGET FOUND")
-                    printOutput(order,visited,actual_Src,target)
+                    break
         
             
-def printOutput(order,visited,actual_Src,target):
+        
     #print(visited[32])
-    print("Order:==================")
-    print(order)
-    order.reverse()
-    print(order)
-    print("==================\n\n")
-    print("Visited:==================")
-    print(visited)
-    print("==================\n\n")
+    # print("Order:==================")
+    # print(order)
+    # order.reverse()
+    # print(order)
+    # print("==================\n\n")
+    # print("Visited:==================")
+    # print(visited)
+    # print("==================\n\n")
     path = []
     #print(numToState[visited[stateToNum[order[0]]]])
     #print(numToState[visited[stateToNum[order[1]]]])
-    
+    curr = visited[target][0]
     for x in order:
-        curr = visited[stateToNum[x]][0]
         path.append(curr)
         if(stateToNum[curr] == actual_Src):
             break
+        curr = visited[stateToNum[path[len(path)-1]]][0]
+        
        
     path.reverse()
     path.append(numToState[target])
@@ -208,7 +193,7 @@ def printOutput(order,visited,actual_Src,target):
         if (i!=0):
             cost = cost + int(costList[stateToNum[path[i-1]]][stateToNum[path[i]]])
     print(cost)
-    exit()
+
 # src = stateToNum[sys.argv[1]]
 # dest = stateToNum[sys.argv[2]]
 
@@ -217,18 +202,21 @@ def printOutput(order,visited,actual_Src,target):
 
 #best_first_search(src, dest, v)
 #A(src,dest,v)
-print("MD->WA:")
-best_first_search(stateToNum["MD"], stateToNum["WA"], v)
-A(stateToNum["MD"], stateToNum["WA"], v)
+# print("MA->MD:")
+# best_first_search(stateToNum["MA"], stateToNum["MD"], v)
+# A(stateToNum["MA"], stateToNum["MD"], v)
+# print("MD->WA:")
+# best_first_search(stateToNum["MD"], stateToNum["WA"], v)
+# A(stateToNum["MD"], stateToNum["WA"], v)
 # print("MI->NM:")
 # best_first_search(stateToNum["MI"], stateToNum["NM"], v)
 # A(stateToNum["MI"], stateToNum["NM"], v)
-# print("NH->AL:")
-# best_first_search(stateToNum["NH"], stateToNum["AL"], v)
-# A(stateToNum["NH"], stateToNum["AL"], v)
-# print("OR->NY:")
-# best_first_search(stateToNum["OR"], stateToNum["NY"], v)
-# A(stateToNum["OR"], stateToNum["NY"], v)
+print("NH->AL:")
+best_first_search(stateToNum["NH"], stateToNum["AL"], v)
+A(stateToNum["NH"], stateToNum["AL"], v)
+print("OR->NY:")
+best_first_search(stateToNum["OR"], stateToNum["NY"], v)
+A(stateToNum["OR"], stateToNum["NY"], v)
 # print("MA->AK:")
 # best_first_search(stateToNum["MA"], stateToNum["AK"], v)
 # A(stateToNum["MA"], stateToNum["AK"], v)
